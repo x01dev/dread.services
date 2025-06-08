@@ -10,24 +10,41 @@
             padding: 0;
             height: 100%;
             overflow: hidden;
-            background-color: black;
+            background: #000;
         }
         video {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            object-fit: cover; /* Ensures video covers full screen */
         }
     </style>
 </head>
 <body>
-    <video autoplay loop muted playsinline>
+    <!-- Video (autoplay, loop, unmuted) -->
+    <video id="videoPlayer" autoplay loop playsinline>
         <source src="newerme.mp4" type="video/mp4">
-        Your browser does not support the video tag.
+        Your browser does not support HTML5 video.
     </video>
 
     <script>
-        // Ensure video plays with audio (unmute if needed)
-        document.querySelector('video').muted = false;
+        const video = document.getElementById('videoPlayer');
+        
+        // Unmute the video (required for autoplay with sound in some browsers)
+        video.muted = false;
+        
+        // Some browsers require a user interaction to play audio.
+        // This triggers a fake click on the page to enable sound.
+        document.addEventListener('click', () => {
+            video.play().catch(e => console.log('Autoplay blocked:', e));
+        });
+        
+        // Attempt to autoplay with sound (may still fail without user interaction)
+        video.play().catch(e => {
+            console.log('Autoplay with sound blocked. Click the page to enable.');
+        });
     </script>
 </body>
 </html>
