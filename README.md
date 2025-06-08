@@ -11,17 +11,20 @@
             height: 100%;
             overflow: hidden;
             background: #000;
-            font-family: 'Arial', sans-serif;
+            font-family: 'Times New Roman', serif;
         }
         video {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
             opacity: 0;
             transition: opacity 1s ease-in-out;
+            z-index: 1;
         }
         video.playing {
             opacity: 1;
@@ -36,33 +39,34 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: opacity 1s ease-in-out;
-            z-index: 10;
+            z-index: 2;
         }
         .overlay.hidden {
             opacity: 0;
             pointer-events: none;
+            transition: opacity 1s ease-in-out;
         }
         .enter-button {
-            padding: 15px 30px;
-            font-size: 24px;
+            padding: 20px 40px;
+            font-size: min(5vw, 28px);
             font-weight: bold;
             color: #fff;
-            background: linear-gradient(145deg, #333333, #1a1a1a);
-            border: 2px solid #666;
+            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+            border: 2px solid #555;
             border-radius: 0;
             text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 4px;
             cursor: pointer;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
             transition: all 0.3s ease;
-            font-family: 'Times New Roman', serif;
-            text-shadow: 0 0 5px #fff;
+            text-shadow: 0 0 8px #fff;
+            min-width: 250px;
+            text-align: center;
         }
         .enter-button:hover {
-            box-shadow: 0 0 25px rgba(255, 215, 0, 0.8);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.9);
             transform: scale(1.05);
         }
         .enter-button:before {
@@ -83,7 +87,7 @@
             opacity: 0.3;
         }
         .enter-button:active {
-            transform: scale(0.95);
+            transform: scale(0.98);
         }
         @keyframes glowing {
             0% { background-position: 0 0; }
@@ -92,27 +96,28 @@
         }
         .click-animation {
             position: absolute;
-            width: 100%;
-            height: 100%;
+            width: 100px;
+            height: 100px;
             background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
             border-radius: 50%;
             transform: scale(0);
             opacity: 0;
             pointer-events: none;
+            mix-blend-mode: screen;
         }
         .animate {
             animation: ripple 1s ease-out;
         }
         @keyframes ripple {
             to {
-                transform: scale(4);
+                transform: scale(3);
                 opacity: 0;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Video (autoplay, loop, unmuted) -->
+    <!-- Video (loop, not autoplaying) -->
     <video id="videoPlayer" loop playsinline>
         <source src="newerme.mp4" type="video/mp4">
         Your browser does not support HTML5 video.
@@ -126,7 +131,7 @@
 
     <!-- Overlay with enter button -->
     <div class="overlay" id="overlay">
-        <button class="enter-button" id="enterButton">Click to Enter</button>
+        <button class="enter-button" id="enterButton">CLICK TO ENTER</button>
     </div>
 
     <script>
@@ -135,29 +140,18 @@
         const overlay = document.getElementById('overlay');
         const enterButton = document.getElementById('enterButton');
         
-        // Initially mute the video (we'll unmute after user interaction)
-        video.muted = true;
-        
-        // Check if video can autoplay
-        const canAutoplay = video.play().then(() => {
-            // Autoplay worked, hide overlay
-            video.classList.add('playing');
-            overlay.classList.add('hidden');
-            video.muted = false;
-            return true;
-        }).catch(e => {
-            // Autoplay blocked, show overlay
-            console.log('Autoplay blocked:', e);
-            return false;
-        });
+        // Ensure video is muted initially and not playing
+        video.muted = false;
+        video.pause();
         
         // Handle enter button click
         enterButton.addEventListener('click', (e) => {
-            // Create ripple effect
+            // Create ripple effect at click position
             const ripple = document.createElement('div');
             ripple.classList.add('click-animation');
-            ripple.style.left = (e.clientX - enterButton.getBoundingClientRect().left) + 'px';
-            ripple.style.top = (e.clientY - enterButton.getBoundingClientRect().top) + 'px';
+            const rect = enterButton.getBoundingClientRect();
+            ripple.style.left = (e.clientX - rect.left - 50) + 'px';
+            ripple.style.top = (e.clientY - rect.top - 50) + 'px';
             enterButton.appendChild(ripple);
             
             // Start animation
@@ -174,27 +168,33 @@
             video.play()
                 .then(() => {
                     video.classList.add('playing');
-                    video.muted = false;
                     music.play();
                     overlay.classList.add('hidden');
                 })
-                .catch(e => console.log('Playback failed:', e));
+                .catch(e => {
+                    console.log('Playback failed:', e);
+                    // Fallback for browsers that block audio without interaction
+                    video.muted = true;
+                    video.play()
+                        .then(() => {
+                            video.classList.add('playing');
+                            overlay.classList.add('hidden');
+                        });
+                });
         });
-        
-        // Some browsers require a user interaction to play audio.
-        // This triggers when clicking anywhere on the page
-        document.addEventListener('click', () => {
-            if (video.paused) {
-                video.play()
-                    .then(() => {
-                        video.classList.add('playing');
-                        video.muted = false;
-                        music.play();
-                        overlay.classList.add('hidden');
-                    })
-                    .catch(e => console.log('Playback failed:', e));
-            }
+
+        // Handle window resize to maintain proper scaling
+        window.addEventListener('resize', () => {
+            // For video scaling
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            
+            // Adjust button size if needed
+            enterButton.style.fontSize = `${Math.min(width * 0.05, 28)}px`;
         });
+
+        // Initial sizing
+        window.dispatchEvent(new Event('resize'));
     </script>
 </body>
 </html>
