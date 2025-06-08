@@ -12,6 +12,7 @@
             overflow: hidden;
             background: #000;
             font-family: 'Times New Roman', serif;
+            visibility: hidden; /* Hide body initially */
         }
         .youtube-container {
             position: fixed;
@@ -117,7 +118,6 @@
     </style>
 </head>
 <body>
-    <!-- YouTube iframe container - initially empty -->
     <div id="youtubeContainer" class="youtube-container"></div>
 
     <audio id="backgroundMusic" loop>
@@ -131,14 +131,17 @@
     </div>
 
     <script>
+        // Wait until the DOM is fully loaded before showing content
+        document.addEventListener("DOMContentLoaded", () => {
+            document.body.style.visibility = "visible";
+        });
+
         const youtubeContainer = document.getElementById('youtubeContainer');
         const music = document.getElementById('backgroundMusic');
         const overlay = document.getElementById('overlay');
         const enterButton = document.getElementById('enterButton');
         
-        // Simple solution that doesn't rely on YouTube API
         enterButton.addEventListener('click', (e) => {
-            // Create click animation
             const ripple = document.createElement('div');
             ripple.classList.add('click-animation');
             const rect = enterButton.getBoundingClientRect();
@@ -154,7 +157,6 @@
                 ripple.remove();
             }, 1000);
             
-            // Create YouTube iframe with all hiding parameters
             youtubeContainer.innerHTML = `
                 <iframe class="youtube-iframe" 
                     src="https://www.youtube.com/embed/sKu8Zg7Hplc?autoplay=1&controls=0&disablekb=1&fs=0&loop=1&modestbranding=1&playsinline=1&rel=0&showinfo=0&mute=1&iv_load_policy=3&cc_load_policy=0&playlist=sKu8Zg7Hplc" 
@@ -164,7 +166,6 @@
                 </iframe>
             `;
             
-            // Show the video and hide overlay
             youtubeContainer.classList.add('playing');
             music.play();
             overlay.classList.add('hidden');
