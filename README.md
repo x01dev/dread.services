@@ -50,24 +50,27 @@
             padding: 20px 40px;
             font-size: min(5vw, 28px);
             font-weight: bold;
-            color: #fff;
-            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
-            border: 2px solid #555;
+            color: #ffffff; /* White text */
+            background: linear-gradient(145deg, #1a1a1a, #333333);
+            border: 2px solid #444;
+            border-top: 2px solid #666;
+            border-bottom: 2px solid #222;
             border-radius: 0;
             text-transform: uppercase;
             letter-spacing: 4px;
             cursor: pointer;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.7);
             transition: all 0.3s ease;
-            text-shadow: 0 0 8px #fff;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
             min-width: 250px;
             text-align: center;
         }
         .enter-button:hover {
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.9);
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.9);
             transform: scale(1.05);
+            text-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
         }
         .enter-button:before {
             content: '';
@@ -76,29 +79,34 @@
             left: -2px;
             right: -2px;
             bottom: -2px;
-            background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
-            background-size: 400%;
+            background: linear-gradient(45deg, 
+                rgba(255, 0, 0, 0.1) 0%, 
+                rgba(80, 0, 0, 0.3) 50%, 
+                rgba(255, 0, 0, 0.1) 100%);
             z-index: -1;
             opacity: 0;
             transition: 0.5s;
-            animation: glowing 20s linear infinite;
         }
         .enter-button:hover:before {
-            opacity: 0.3;
+            opacity: 1;
+            animation: red-pulse 2s linear infinite;
         }
         .enter-button:active {
             transform: scale(0.98);
+            background: linear-gradient(145deg, #111111, #2a2a2a);
         }
-        @keyframes glowing {
-            0% { background-position: 0 0; }
-            50% { background-position: 400% 0; }
-            100% { background-position: 0 0; }
+        @keyframes red-pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
         }
         .click-animation {
             position: absolute;
             width: 100px;
             height: 100px;
-            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+            background: radial-gradient(circle, 
+                rgba(255, 0, 0, 0.8) 0%, 
+                rgba(255, 0, 0, 0) 70%);
             border-radius: 50%;
             transform: scale(0);
             opacity: 0;
