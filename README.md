@@ -159,6 +159,54 @@
             box-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
             transform: scale(1.05);
         }
+        .volume-container {
+            position: fixed;
+            bottom: 50px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .volume-container.visible {
+            opacity: 1;
+        }
+        .volume-slider {
+            -webkit-appearance: none;
+            width: 120px;
+            height: 8px;
+            background: linear-gradient(145deg, #1a1a1a, #333333);
+            border: 2px solid #444;
+            border-top: 2px solid #666;
+            border-bottom: 2px solid #222;
+            outline: none;
+            margin-left: 10px;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #ffffff;
+            cursor: pointer;
+            border: 2px solid #444;
+            box-shadow: 0 0 5px rgba(255, 0, 0, 0.7);
+        }
+        .volume-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            background: #ffffff;
+            cursor: pointer;
+            border: 2px solid #444;
+            box-shadow: 0 0 5px rgba(255, 0, 0, 0.7);
+        }
+        .volume-icon {
+            color: #ffffff;
+            font-size: 24px;
+            text-shadow: 0 0 5px rgba(255, 0, 0, 0.7);
+        }
         .login-page {
             position: fixed;
             top: 0;
@@ -295,6 +343,11 @@
         <button class="enter-button" id="enterButton">CLICK TO ENTER</button>
     </div>
 
+    <div class="volume-container" id="volumeContainer">
+        <div class="volume-icon">🔊</div>
+        <input type="range" min="0" max="1" step="0.01" value="0.5" class="volume-slider" id="volumeSlider">
+    </div>
+
     <button class="login-button" id="loginButton">LOGIN</button>
     
     <div class="login-page" id="loginPage">
@@ -343,6 +396,9 @@
             'Hair.mp3'
         ];
 
+        // YouTube iframe reference
+        let youtubeIframe = null;
+
         // Function to shuffle array
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -355,7 +411,7 @@
         // Function to play shuffled songs
         function playShuffledSongs() {
             const music = document.getElementById('backgroundMusic');
-            const shuffledSongs = shuffleArray([...songs]); // Create a copy and shuffle it
+            let shuffledSongs = shuffleArray([...songs]); // Create a copy and shuffle it
             
             let currentSongIndex = 0;
             
@@ -378,6 +434,26 @@
             
             // Start playing the first song
             playNextSong();
+        }
+
+        // Function to pause all media
+        function pauseAllMedia() {
+            const music = document.getElementById('backgroundMusic');
+            music.pause();
+            
+            if (youtubeIframe) {
+                youtubeIframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+            }
+        }
+
+        // Function to resume all media
+        function resumeAllMedia() {
+            const music = document.getElementById('backgroundMusic');
+            music.play();
+            
+            if (youtubeIframe) {
+                youtubeIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+            }
         }
 
         // Authentication functions
@@ -407,6 +483,7 @@
             
             // Hide login button initially
             document.getElementById('loginButton').style.display = 'none';
+            document.getElementById('volumeContainer').style.display = 'none';
             
             // If already logged in, show logged in page
             if (checkAuth()) {
@@ -415,9 +492,11 @@
                 // Start video and music if already logged in
                 loadYouTubeVideo();
                 playShuffledSongs();
-                // Show login button immediately if already logged in
+                // Show login button and volume control immediately if already logged in
                 loginButton.style.display = 'block';
                 loginButton.classList.add('visible');
+                volumeContainer.style.display = 'flex';
+                volumeContainer.classList.add('visible');
             }
         });
 
@@ -434,6 +513,16 @@
         const passwordInput = document.getElementById('password');
         const loginMessage = document.getElementById('loginMessage');
         const loggedInPage = document.getElementById('loggedInPage');
+        const volumeContainer = document.getElementById('volumeContainer');
+        const volumeSlider = document.getElementById('volumeSlider');
+
+        // Volume control
+        volumeSlider.addEventListener('input', (e) => {
+            music.volume = e.target.value;
+        });
+
+        // Set initial volume
+        music.volume = volumeSlider.value;
 
         // YouTube video loader function
         function loadYouTubeVideo() {
@@ -444,6 +533,9 @@
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                     allowfullscreen>
                 </iframe>`;
+            
+            // Store reference to iframe
+            youtubeIframe = youtubeContainer.querySelector('.youtube-iframe');
             
             // Add slight delay before showing to ensure it's loaded
             setTimeout(() => {
@@ -473,11 +565,13 @@
             loadYouTubeVideo();
             playShuffledSongs();
             
-            // Hide the enter button and show the login button
+            // Hide the enter button and show the login button and volume control
             enterButton.style.display = 'none';
             loginButton.style.display = 'block';
+            volumeContainer.style.display = 'flex';
             setTimeout(() => {
                 loginButton.classList.add('visible');
+                volumeContainer.classList.add('visible');
             }, 500);
             
             // Optionally fade out the overlay (but keep it in DOM for potential login)
@@ -486,6 +580,7 @@
 
         // Login button click
         loginButton.addEventListener('click', () => {
+            pauseAllMedia();
             loginPage.classList.add('visible');
         });
         
@@ -493,6 +588,7 @@
         closeLogin.addEventListener('click', () => {
             loginPage.classList.remove('visible');
             loginMessage.textContent = '';
+            resumeAllMedia();
         });
         
         // Login submit
@@ -520,6 +616,9 @@
                     
                     usernameInput.value = '';
                     passwordInput.value = '';
+                    
+                    // Resume media after login
+                    resumeAllMedia();
                 }, 1000);
             } else {
                 loginMessage.textContent = 'Invalid credentials';
