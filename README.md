@@ -327,6 +327,53 @@
             opacity: 1;
             pointer-events: all;
         }
+        .test-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s ease;
+        }
+        .test-page.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .test-button {
+            padding: 20px 40px;
+            font-size: min(5vw, 28px);
+            font-weight: bold;
+            color: #ffffff;
+            background: linear-gradient(145deg, #1a1a1a, #333333);
+            border: 2px solid #444;
+            border-top: 2px solid #666;
+            border-bottom: 2px solid #222;
+            border-radius: 0;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.7);
+            transition: all 0.3s ease;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+            min-width: 250px;
+            text-align: center;
+            margin-top: 40px;
+        }
+        .test-button:hover {
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.9);
+            transform: scale(1.05);
+            text-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+        }
     </style>
 </head>
 <body>
@@ -370,6 +417,11 @@
 
     <div class="logged-in-page" id="loggedInPage">
         LOGGED IN
+    </div>
+
+    <div class="test-page" id="testPage">
+        <div class="title-text">TEST PAGE</div>
+        <button class="test-button" id="testButton">TEST</button>
     </div>
 
     <script>
@@ -436,10 +488,28 @@
             playNextSong();
         }
 
+        // Function to fade out music
+        function fadeOutMusic(duration = 2000) {
+            const music = document.getElementById('backgroundMusic');
+            const startVolume = music.volume;
+            const fadeInterval = 50;
+            const steps = duration / fadeInterval;
+            const stepSize = startVolume / steps;
+            
+            const fadeAudio = setInterval(() => {
+                if (music.volume > stepSize) {
+                    music.volume -= stepSize;
+                } else {
+                    music.volume = 0;
+                    clearInterval(fadeAudio);
+                    music.pause();
+                }
+            }, fadeInterval);
+        }
+
         // Function to pause all media
         function pauseAllMedia() {
-            const music = document.getElementById('backgroundMusic');
-            music.pause();
+            fadeOutMusic();
             
             if (youtubeIframe) {
                 youtubeIframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
@@ -449,6 +519,7 @@
         // Function to resume all media
         function resumeAllMedia() {
             const music = document.getElementById('backgroundMusic');
+            music.volume = document.getElementById('volumeSlider').value;
             music.play();
             
             if (youtubeIframe) {
@@ -497,6 +568,12 @@
                 loginButton.classList.add('visible');
                 volumeContainer.style.display = 'flex';
                 volumeContainer.classList.add('visible');
+                
+                // After 3 seconds, show the test page
+                setTimeout(() => {
+                    document.getElementById('loggedInPage').classList.remove('visible');
+                    document.getElementById('testPage').classList.add('visible');
+                }, 3000);
             }
         });
 
@@ -515,6 +592,8 @@
         const loggedInPage = document.getElementById('loggedInPage');
         const volumeContainer = document.getElementById('volumeContainer');
         const volumeSlider = document.getElementById('volumeSlider');
+        const testPage = document.getElementById('testPage');
+        const testButton = document.getElementById('testButton');
 
         // Volume control
         volumeSlider.addEventListener('input', (e) => {
@@ -612,6 +691,12 @@
                     // Show logged in page after a delay
                     setTimeout(() => {
                         loggedInPage.classList.add('visible');
+                        
+                        // After 3 seconds, show the test page
+                        setTimeout(() => {
+                            loggedInPage.classList.remove('visible');
+                            testPage.classList.add('visible');
+                        }, 3000);
                     }, 1000);
                     
                     usernameInput.value = '';
@@ -631,6 +716,11 @@
             if (e.key === 'Enter') {
                 loginSubmit.click();
             }
+        });
+
+        // Test button click
+        testButton.addEventListener('click', () => {
+            alert('Test button clicked!');
         });
 
         // Responsive font sizing
