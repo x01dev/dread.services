@@ -287,9 +287,7 @@
 
     <div id="youtubeContainer" class="youtube-container"></div>
 
-    <audio id="backgroundMusic" loop>
-        <source src="music.mp3" type="audio/mpeg">
-    </audio>
+    <audio id="backgroundMusic"></audio>
 
     <div class="overlay" id="overlay">
         <div class="title-text">dread.services</div>
@@ -330,6 +328,58 @@
                  + Math.random().toString(36).substring(2, 15)
         };
 
+        // List of songs in the music directory
+        const songs = [
+            'Scars.mp3',
+            'Rip.mp3',
+            'Zero.mp3',
+            'Plata.mp3',
+            'Peach.mp3',
+            'Leave.mp3',
+            'Peace.mp3',
+            'Foreal.mp3',
+            'Prove.mp3',
+            'Newer.mp3',
+            'Hair.mp3'
+        ];
+
+        // Function to shuffle array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Function to play shuffled songs
+        function playShuffledSongs() {
+            const music = document.getElementById('backgroundMusic');
+            const shuffledSongs = shuffleArray([...songs]); // Create a copy and shuffle it
+            
+            let currentSongIndex = 0;
+            
+            function playNextSong() {
+                if (currentSongIndex >= shuffledSongs.length) {
+                    // If we've played all songs, reshuffle and start over
+                    shuffledSongs = shuffleArray([...songs]);
+                    currentSongIndex = 0;
+                }
+                
+                const song = shuffledSongs[currentSongIndex];
+                music.src = `music/${song}`;
+                music.play();
+                
+                currentSongIndex++;
+            }
+            
+            // Set up event listener for when a song ends
+            music.addEventListener('ended', playNextSong);
+            
+            // Start playing the first song
+            playNextSong();
+        }
+
         // Authentication functions
         function setAuth() {
             const now = new Date();
@@ -364,7 +414,7 @@
                 document.getElementById('overlay').style.display = 'none';
                 // Start video and music if already logged in
                 loadYouTubeVideo();
-                music.play();
+                playShuffledSongs();
                 // Show login button immediately if already logged in
                 loginButton.style.display = 'block';
                 loginButton.classList.add('visible');
@@ -421,7 +471,7 @@
             
             // Load YouTube video and play music immediately
             loadYouTubeVideo();
-            music.play();
+            playShuffledSongs();
             
             // Hide the enter button and show the login button
             enterButton.style.display = 'none';
