@@ -31,7 +31,7 @@
             width: 100%;
             height: 100%;
             border: none;
-            transform: translateY(30%);
+            transform: translateY(-60%);
         }
         .overlay {
             position: fixed;
