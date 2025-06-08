@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Add this first to prevent FOUC (Flash of Unstyled Content) -->
+    <!-- FOUC Prevention - Add this FIRST in head -->
     <style>
         html { 
             background-color: #000;
@@ -15,6 +15,11 @@
             overflow: hidden;
             background: #000;
             font-family: 'Times New Roman', serif;
+        }
+        body.loaded {
+            visibility: visible;
+            opacity: 1;
+            transition: opacity 0.5s ease;
         }
     </style>
     
@@ -347,12 +352,8 @@
 
         // DOM Ready
         document.addEventListener("DOMContentLoaded", () => {
-            // Show the page content smoothly
-            setTimeout(() => {
-                document.body.style.visibility = "visible";
-                document.body.style.opacity = "1";
-                document.getElementById('preloader').style.display = 'none';
-            }, 50);
+            // Add 'loaded' class to fade in the page
+            document.body.classList.add('loaded');
             
             // Hide login button initially
             document.getElementById('loginButton').style.display = 'none';
