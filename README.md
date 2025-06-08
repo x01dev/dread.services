@@ -18,7 +18,7 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
+            height: 130%;
             opacity: 0;
             transition: opacity 1s ease-in-out;
             z-index: 1;
