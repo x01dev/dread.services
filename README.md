@@ -50,7 +50,7 @@
             padding: 20px 40px;
             font-size: min(5vw, 28px);
             font-weight: bold;
-            color: #ffffff; /* White text */
+            color: #ffffff;
             background: linear-gradient(145deg, #1a1a1a, #333333);
             border: 2px solid #444;
             border-top: 2px solid #666;
@@ -125,19 +125,16 @@
     </style>
 </head>
 <body>
-    <!-- Video (loop, not autoplaying) -->
     <video id="videoPlayer" loop playsinline>
         <source src="newerme.mp4" type="video/mp4">
         Your browser does not support HTML5 video.
     </video>
 
-    <!-- Audio element for music -->
     <audio id="backgroundMusic" loop>
         <source src="music.mp3" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
 
-    <!-- Overlay with enter button -->
     <div class="overlay" id="overlay">
         <button class="enter-button" id="enterButton">CLICK TO ENTER</button>
     </div>
@@ -148,13 +145,10 @@
         const overlay = document.getElementById('overlay');
         const enterButton = document.getElementById('enterButton');
         
-        // Ensure video is muted initially and not playing
         video.muted = false;
         video.pause();
         
-        // Handle enter button click
         enterButton.addEventListener('click', (e) => {
-            // Create ripple effect at click position
             const ripple = document.createElement('div');
             ripple.classList.add('click-animation');
             const rect = enterButton.getBoundingClientRect();
@@ -162,17 +156,14 @@
             ripple.style.top = (e.clientY - rect.top - 50) + 'px';
             enterButton.appendChild(ripple);
             
-            // Start animation
             setTimeout(() => {
                 ripple.classList.add('animate');
             }, 10);
             
-            // Remove ripple after animation
             setTimeout(() => {
                 ripple.remove();
             }, 1000);
             
-            // Play video and music
             video.play()
                 .then(() => {
                     video.classList.add('playing');
@@ -181,7 +172,6 @@
                 })
                 .catch(e => {
                     console.log('Playback failed:', e);
-                    // Fallback for browsers that block audio without interaction
                     video.muted = true;
                     video.play()
                         .then(() => {
@@ -191,17 +181,12 @@
                 });
         });
 
-        // Handle window resize to maintain proper scaling
         window.addEventListener('resize', () => {
-            // For video scaling
             const width = window.innerWidth;
             const height = window.innerHeight;
-            
-            // Adjust button size if needed
             enterButton.style.fontSize = `${Math.min(width * 0.05, 28)}px`;
         });
 
-        // Initial sizing
         window.dispatchEvent(new Event('resize'));
     </script>
 </body>
