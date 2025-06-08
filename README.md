@@ -23,6 +23,7 @@
             transition: opacity 1s ease-in-out;
             z-index: 1;
             pointer-events: none;
+             transform: translateY(-10%);
         }
         .youtube-container.playing {
             opacity: 1;
