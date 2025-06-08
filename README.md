@@ -4,12 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>dread.services</title>
-    <meta property="og:title" content="dread.services">
-    <meta property="og:site_name" content="dread.services">
-    <meta property="og:url" content="https://www.dread.services/">
-    <meta property="og:description" content="Work In Progress">
-    <meta property="og:type" content="website">
-    <meta name="theme-color" content="#000000">
     <style>
         body, html {
             margin: 0;
@@ -19,21 +13,24 @@
             background: #000;
             font-family: 'Times New Roman', serif;
         }
-        video {
+        .youtube-container {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             opacity: 0;
             transition: opacity 1s ease-in-out;
             z-index: 1;
+            pointer-events: none;
         }
-        video.playing {
+        .youtube-container.playing {
             opacity: 1;
+        }
+        .youtube-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
         .overlay {
             position: fixed;
@@ -62,11 +59,11 @@
             text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
         }
         .subtitle-text {
-            color: #FFFF00; /* Changed to yellow */
+            color: #FFFF00;
             font-size: min(3vw, 24px);
             letter-spacing: 2px;
             margin-bottom: 40px;
-            text-shadow: 0 0 8px rgba(255, 255, 0, 0.7); /* Yellow glow to match */
+            text-shadow: 0 0 8px rgba(255, 255, 0, 0.7);
         }
         .enter-button {
             padding: 20px 40px;
@@ -94,34 +91,6 @@
             transform: scale(1.05);
             text-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
         }
-        .enter-button:before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(45deg, 
-                rgba(255, 0, 0, 0.1) 0%, 
-                rgba(80, 0, 0, 0.3) 50%, 
-                rgba(255, 0, 0, 0.1) 100%);
-            z-index: -1;
-            opacity: 0;
-            transition: 0.5s;
-        }
-        .enter-button:hover:before {
-            opacity: 1;
-            animation: red-pulse 2s linear infinite;
-        }
-        .enter-button:active {
-            transform: scale(0.98);
-            background: linear-gradient(145deg, #111111, #2a2a2a);
-        }
-        @keyframes red-pulse {
-            0% { opacity: 0.7; }
-            50% { opacity: 1; }
-            100% { opacity: 0.7; }
-        }
         .click-animation {
             position: absolute;
             width: 100px;
@@ -147,14 +116,11 @@
     </style>
 </head>
 <body>
-    <video id="videoPlayer" loop playsinline>
-        <source src="newerme.mp4" type="video/mp4">
-        Your browser does not support HTML5 video.
-    </video>
+    <!-- YouTube iframe container - initially empty -->
+    <div id="youtubeContainer" class="youtube-container"></div>
 
     <audio id="backgroundMusic" loop>
         <source src="music.mp3" type="audio/mpeg">
-        Your browser does not support the audio element.
     </audio>
 
     <div class="overlay" id="overlay">
@@ -164,15 +130,14 @@
     </div>
 
     <script>
-        const video = document.getElementById('videoPlayer');
+        const youtubeContainer = document.getElementById('youtubeContainer');
         const music = document.getElementById('backgroundMusic');
         const overlay = document.getElementById('overlay');
         const enterButton = document.getElementById('enterButton');
         
-        video.muted = false;
-        video.pause();
-        
+        // Simple solution that doesn't rely on YouTube API
         enterButton.addEventListener('click', (e) => {
+            // Create click animation
             const ripple = document.createElement('div');
             ripple.classList.add('click-animation');
             const rect = enterButton.getBoundingClientRect();
@@ -188,26 +153,24 @@
                 ripple.remove();
             }, 1000);
             
-            video.play()
-                .then(() => {
-                    video.classList.add('playing');
-                    music.play();
-                    overlay.classList.add('hidden');
-                })
-                .catch(e => {
-                    console.log('Playback failed:', e);
-                    video.muted = true;
-                    video.play()
-                        .then(() => {
-                            video.classList.add('playing');
-                            overlay.classList.add('hidden');
-                        });
-                });
+            // Create YouTube iframe with all hiding parameters
+            youtubeContainer.innerHTML = `
+                <iframe class="youtube-iframe" 
+                    src="https://www.youtube.com/embed/sKu8Zg7Hplc?autoplay=1&controls=0&disablekb=1&fs=0&loop=1&modestbranding=1&playsinline=1&rel=0&showinfo=0&mute=1&iv_load_policy=3&cc_load_policy=0&playlist=sKu8Zg7Hplc" 
+                    frameborder="0" 
+                    allow="autoplay; encrypted-media" 
+                    allowfullscreen>
+                </iframe>
+            `;
+            
+            // Show the video and hide overlay
+            youtubeContainer.classList.add('playing');
+            music.play();
+            overlay.classList.add('hidden');
         });
 
         window.addEventListener('resize', () => {
             const width = window.innerWidth;
-            const height = window.innerHeight;
             enterButton.style.fontSize = `${Math.min(width * 0.05, 28)}px`;
         });
 
