@@ -145,7 +145,7 @@
             text-transform: uppercase;
             letter-spacing: 2px;
             cursor: pointer;
-            z-index: 100;
+            z-index: 1002; /* Updated from 100 to 1002 */
             box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
             transition: all 0.3s ease;
             text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
@@ -156,6 +156,36 @@
             opacity: 1;
         }
         .login-button:hover {
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
+            transform: scale(1.05);
+        }
+        .logout-button {
+            position: fixed;
+            bottom: 50px;
+            right: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #ffffff;
+            background: linear-gradient(145deg, #1a1a1a, #333333);
+            border: 2px solid #444;
+            border-top: 2px solid #666;
+            border-bottom: 2px solid #222;
+            border-radius: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            z-index: 1002; /* Updated from 100 to 1002 */
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .logout-button.visible {
+            opacity: 1;
+        }
+        .logout-button:hover {
             box-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
             transform: scale(1.05);
         }
@@ -396,6 +426,7 @@
     </div>
 
     <button class="login-button" id="loginButton">LOGIN</button>
+    <button class="logout-button" id="logoutButton">LOGOUT</button>
     
     <div class="login-page" id="loginPage">
         <span class="close-login" id="closeLogin">&times;</span>
@@ -527,6 +558,37 @@
             }
         }
 
+        // Function to reset to initial state
+        function resetToInitialState() {
+            // Hide all pages except overlay
+            document.getElementById('loginPage').classList.remove('visible');
+            document.getElementById('loggedInPage').classList.remove('visible');
+            document.getElementById('testPage').classList.remove('visible');
+            
+            // Show overlay and enter button
+            document.getElementById('overlay').classList.remove('hidden');
+            document.getElementById('enterButton').style.display = 'block';
+            
+            // Hide login/logout buttons and volume control
+            document.getElementById('loginButton').style.display = 'none';
+            document.getElementById('loginButton').classList.remove('visible');
+            document.getElementById('logoutButton').style.display = 'none';
+            document.getElementById('logoutButton').classList.remove('visible');
+            document.getElementById('volumeContainer').style.display = 'none';
+            document.getElementById('volumeContainer').classList.remove('visible');
+            
+            // Clear auth
+            clearAuth();
+            
+            // Pause all media
+            pauseAllMedia();
+            
+            // Remove YouTube iframe
+            document.getElementById('youtubeContainer').innerHTML = '';
+            document.getElementById('youtubeContainer').classList.remove('playing');
+            youtubeIframe = null;
+        }
+
         // Authentication functions
         function setAuth() {
             const now = new Date();
@@ -552,8 +614,9 @@
             // Add 'loaded' class to fade in the page
             document.body.classList.add('loaded');
             
-            // Hide login button initially
+            // Hide login/logout buttons initially
             document.getElementById('loginButton').style.display = 'none';
+            document.getElementById('logoutButton').style.display = 'none';
             document.getElementById('volumeContainer').style.display = 'none';
             
             // If already logged in, show logged in page
@@ -563,16 +626,17 @@
                 // Start video and music if already logged in
                 loadYouTubeVideo();
                 playShuffledSongs();
-                // Show login button and volume control immediately if already logged in
-                loginButton.style.display = 'block';
-                loginButton.classList.add('visible');
+                // Show logout button and volume control immediately if already logged in
+                document.getElementById('logoutButton').style.display = 'block';
+                document.getElementById('logoutButton').classList.add('visible');
                 volumeContainer.style.display = 'flex';
                 volumeContainer.classList.add('visible');
                 
-                // After 3 seconds, show the test page
+                // After 3 seconds, show the test page and fade out music
                 setTimeout(() => {
                     document.getElementById('loggedInPage').classList.remove('visible');
                     document.getElementById('testPage').classList.add('visible');
+                    fadeOutMusic();
                 }, 3000);
             }
         });
@@ -583,6 +647,7 @@
         const overlay = document.getElementById('overlay');
         const enterButton = document.getElementById('enterButton');
         const loginButton = document.getElementById('loginButton');
+        const logoutButton = document.getElementById('logoutButton');
         const loginPage = document.getElementById('loginPage');
         const closeLogin = document.getElementById('closeLogin');
         const loginSubmit = document.getElementById('loginSubmit');
@@ -692,23 +757,32 @@
                     setTimeout(() => {
                         loggedInPage.classList.add('visible');
                         
-                        // After 3 seconds, show the test page
+                        // After 3 seconds, show the test page and fade out music
                         setTimeout(() => {
                             loggedInPage.classList.remove('visible');
                             testPage.classList.add('visible');
+                            fadeOutMusic();
+                            
+                            // Show logout button
+                            logoutButton.style.display = 'block';
+                            setTimeout(() => {
+                                logoutButton.classList.add('visible');
+                            }, 100);
                         }, 3000);
                     }, 1000);
                     
                     usernameInput.value = '';
                     passwordInput.value = '';
-                    
-                    // Resume media after login
-                    resumeAllMedia();
                 }, 1000);
             } else {
                 loginMessage.textContent = 'Invalid credentials';
                 loginMessage.style.color = '#FF0000';
             }
+        });
+        
+        // Logout button click
+        logoutButton.addEventListener('click', () => {
+            resetToInitialState();
         });
         
         // Enter key for password field
