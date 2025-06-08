@@ -344,6 +344,12 @@
             if (checkAuth()) {
                 document.getElementById('loggedInPage').classList.add('visible');
                 document.getElementById('overlay').style.display = 'none';
+                // Start video and music if already logged in
+                loadYouTubeVideo();
+                music.play();
+                // Show login button immediately if already logged in
+                loginButton.style.display = 'block';
+                loginButton.classList.add('visible');
             }
         });
 
@@ -360,6 +366,22 @@
         const passwordInput = document.getElementById('password');
         const loginMessage = document.getElementById('loginMessage');
         const loggedInPage = document.getElementById('loggedInPage');
+
+        // YouTube video loader function
+        function loadYouTubeVideo() {
+            youtubeContainer.innerHTML = `
+                <iframe class="youtube-iframe" 
+                    src="https://www.youtube.com/embed/sKu8Zg7Hplc?autoplay=1&controls=0&disablekb=1&fs=0&loop=1&modestbranding=1&playsinline=1&rel=0&showinfo=0&mute=1&iv_load_policy=3&cc_load_policy=0&playlist=sKu8Zg7Hplc&enablejsapi=1" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>`;
+            
+            // Add slight delay before showing to ensure it's loaded
+            setTimeout(() => {
+                youtubeContainer.classList.add('playing');
+            }, 300);
+        }
 
         // Enter button click
         enterButton.addEventListener('click', (e) => {
@@ -379,14 +401,19 @@
                 ripple.remove();
             }, 1000);
             
-            // Show login button
+            // Load YouTube video and play music immediately
+            loadYouTubeVideo();
+            music.play();
+            
+            // Hide the enter button and show the login button
+            enterButton.style.display = 'none';
             loginButton.style.display = 'block';
             setTimeout(() => {
                 loginButton.classList.add('visible');
-            }, 100);
+            }, 500);
             
-            // Hide enter button
-            enterButton.style.display = 'none';
+            // Optionally fade out the overlay (but keep it in DOM for potential login)
+            overlay.classList.add('hidden');
         });
 
         // Login button click
@@ -416,7 +443,6 @@
                 setAuth();
                 setTimeout(() => {
                     loginPage.classList.remove('visible');
-                    overlay.classList.add('hidden');
                     loginButton.classList.remove('visible');
                     
                     // Show logged in page after a delay
