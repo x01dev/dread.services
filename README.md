@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Player</title>
+    <title>dread.services</title>
+    <meta property="og:title" content="dread.services">
+    <meta property="og:site_name" content="dread.services">
+    <meta property="og:url" content="https://www.dread.services/">
+    <meta property="og:description" content="Work In Progress">
+    <meta property="og:type" content="website">
+    <meta name="theme-color" content="#000000">
     <style>
         body, html {
             margin: 0;
@@ -37,6 +43,7 @@
             height: 100%;
             background: #000;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 2;
@@ -45,6 +52,21 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity 1s ease-in-out;
+        }
+        .title-text {
+            color: #ffffff;
+            font-size: min(5vw, 36px);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+        }
+        .subtitle-text {
+            color: #FFFF00; /* Changed to yellow */
+            font-size: min(3vw, 24px);
+            letter-spacing: 2px;
+            margin-bottom: 40px;
+            text-shadow: 0 0 8px rgba(255, 255, 0, 0.7); /* Yellow glow to match */
         }
         .enter-button {
             padding: 20px 40px;
@@ -136,6 +158,8 @@
     </audio>
 
     <div class="overlay" id="overlay">
+        <div class="title-text">dread.services</div>
+        <div class="subtitle-text">Work In Progress</div>
         <button class="enter-button" id="enterButton">CLICK TO ENTER</button>
     </div>
 
