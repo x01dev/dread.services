@@ -118,7 +118,7 @@
         /* Login button styles */
         .login-button {
             position: fixed;
-            bottom: 200px;
+            bottom: 150px;
             right: 20px;
             padding: 10px 20px;
             font-size: 16px;
