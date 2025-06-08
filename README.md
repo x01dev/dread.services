@@ -1,19 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>dread.services</title>
+    <!-- Add this first to prevent FOUC (Flash of Unstyled Content) -->
     <style>
-        body, html {
+        html { 
+            background-color: #000;
+        }
+        body {
+            visibility: hidden;
+            opacity: 0;
             margin: 0;
             padding: 0;
             height: 100%;
             overflow: hidden;
             background: #000;
             font-family: 'Times New Roman', serif;
-            visibility: hidden;
         }
+    </style>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>dread.services</title>
+    <style>
         .youtube-container {
             position: fixed;
             top: 0;
@@ -268,6 +277,9 @@
     </style>
 </head>
 <body>
+    <!-- Preloader (hidden by default, shown only if needed) -->
+    <div id="preloader" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:9999;display:none;"></div>
+
     <div id="youtubeContainer" class="youtube-container"></div>
 
     <audio id="backgroundMusic" loop>
@@ -335,7 +347,12 @@
 
         // DOM Ready
         document.addEventListener("DOMContentLoaded", () => {
-            document.body.style.visibility = "visible";
+            // Show the page content smoothly
+            setTimeout(() => {
+                document.body.style.visibility = "visible";
+                document.body.style.opacity = "1";
+                document.getElementById('preloader').style.display = 'none';
+            }, 50);
             
             // Hide login button initially
             document.getElementById('loginButton').style.display = 'none';
