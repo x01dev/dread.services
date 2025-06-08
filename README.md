@@ -115,6 +115,37 @@
                 opacity: 0;
             }
         }
+        /* Login button styles */
+        .login-button {
+            position: fixed;
+            bottom: 200px;
+            right: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #ffffff;
+            background: linear-gradient(145deg, #1a1a1a, #333333);
+            border: 2px solid #444;
+            border-top: 2px solid #666;
+            border-bottom: 2px solid #222;
+            border-radius: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .login-button.visible {
+            opacity: 1;
+        }
+        .login-button:hover {
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
@@ -130,16 +161,24 @@
         <button class="enter-button" id="enterButton">CLICK TO ENTER</button>
     </div>
 
+    <!-- Login button -->
+    <button class="login-button" id="loginButton">LOGIN</button>
+
     <script>
         // Wait until the DOM is fully loaded before showing content
         document.addEventListener("DOMContentLoaded", () => {
             document.body.style.visibility = "visible";
+            // Show login button after a short delay
+            setTimeout(() => {
+                document.getElementById('loginButton').classList.add('visible');
+            }, 500);
         });
 
         const youtubeContainer = document.getElementById('youtubeContainer');
         const music = document.getElementById('backgroundMusic');
         const overlay = document.getElementById('overlay');
         const enterButton = document.getElementById('enterButton');
+        const loginButton = document.getElementById('loginButton');
         
         enterButton.addEventListener('click', (e) => {
             const ripple = document.createElement('div');
@@ -169,6 +208,12 @@
             youtubeContainer.classList.add('playing');
             music.play();
             overlay.classList.add('hidden');
+        });
+
+        // Login button functionality
+        loginButton.addEventListener('click', () => {
+            alert('Login functionality would go here');
+            // You can replace this with actual login logic
         });
 
         window.addEventListener('resize', () => {
